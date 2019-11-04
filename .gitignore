@@ -1,0 +1,10 @@
+
+# Ignore jupyter files generated from testing.
+*.ipynb
+.local/
+.jupyter/
+.ipython/
+.ipynb_checkpoints/
+.cufflinks/
+.config/
+.cache/
