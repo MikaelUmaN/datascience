@@ -18,7 +18,8 @@ RUN conda install -y dask distributed
 
 RUN conda install pytorch-cpu torchvision-cpu -c pytorch
 
-RUN conda install cvxopt cvxpy lxml dash plotly=3.10.0 gunicorn line_profiler cookiecutter
+# Restrict plotly version because we need it to be in sync with cufflinks.
+RUN conda install cvxopt cvxpy lxml dash plotly==4.2.1 gunicorn line_profiler cookiecutter
 
 RUN pip install pandas-profiling impyute fancyimpute requests_ntlm
 
