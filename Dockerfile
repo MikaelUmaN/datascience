@@ -1,4 +1,4 @@
-FROM jupyter/datascience-notebook:latest
+FROM jupyter/datascience-notebook:1386e2046833
 
 USER root
 RUN apt-get update && apt-get install -y htop neovim jq
@@ -23,6 +23,11 @@ RUN conda install cvxopt cvxpy lxml dash plotly==4.2.1 gunicorn line_profiler co
 
 RUN pip install pandas-profiling impyute fancyimpute requests_ntlm
 
+RUN pip install jupyterhub==0.9.6 distributed==2.7.0 dask==2.7.0 dask-kubernetes==0.10.0 jupyter-server-proxy && \
+    jupyter serverextension enable --sys-prefix jupyter_server_proxy
+
+# Numpy multithreading uses MKL lib and for it to work properly on kubernetes
+# this variable needs to be set. Else numpy thinks it has access to all cores on the node.
 ENV MKL_THREADING_LAYER=GNU
 
 CMD ["start.sh", "jupyter", "lab"]
