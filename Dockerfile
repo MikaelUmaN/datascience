@@ -1,7 +1,7 @@
 FROM jupyter/datascience-notebook:1386e2046833
 
 USER root
-RUN apt-get update && apt-get install -y apt-utils htop neovim jq graphviz
+RUN apt-get update && apt-get install -y htop neovim jq graphviz
 
 USER jovyan
 
@@ -27,5 +27,10 @@ RUN pip install jupyterhub==0.9.6 distributed==2.7.0 dask==2.7.0 dask-kubernetes
 # Numpy multithreading uses MKL lib and for it to work properly on kubernetes
 # this variable needs to be set. Else numpy thinks it has access to all cores on the node.
 ENV MKL_THREADING_LAYER=GNU
+
+# NLTK data (corpuses etc.)
+RUN python -c "import nltk; nltk.download('punkt')"
+RUN python -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+RUN python -c "import nltk; nltk.download('stopwords')"
 
 CMD ["start.sh", "jupyter", "lab"]
