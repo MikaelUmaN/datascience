@@ -1,36 +1,47 @@
-FROM jupyter/datascience-notebook:1386e2046833
+FROM jupyter/datascience-notebook:7a0c7325e470
 
 USER root
 RUN apt-get update && apt-get install -y htop neovim jq graphviz
 
 USER jovyan
 
-RUN conda install fastparquet pyarrow python-snappy pandas numpy
-
-RUN pip install cufflinks==0.17.0 plotly==4.2.1 chart_studio==1.0.0 && \
-    jupyter labextension install @jupyterlab/plotly-extension && \
-    jupyter labextension install jupyterlab_vim
-
-RUN conda install -c conda-forge pymc3 theano mkl-service seaborn tqdm aiofiles aiohttp html5lib nltk graphviz
-RUN conda install -c r rpy2
-RUN conda install -y dask distributed
-RUN conda install pytorch-cpu torchvision-cpu -c pytorch
-
+# Lock jupyter client version because a bug for windows has been introduced in later versions.
 # Restrict plotly version because we need it to be in sync with cufflinks.
-RUN conda install cvxopt cvxpy lxml dash plotly==4.2.1 gunicorn line_profiler cookiecutter
+RUN conda install -y jupyter_client=5.3.1 fastparquet pyarrow python-snappy pandas numpy=1 \
+    cvxopt cvxpy lxml line_profiler cookiecutter dash=1 plotly=4 gunicorn \
+    pandas-profiling requests_ntlm dask=2 distributed=2
 
-RUN pip install pandas-profiling impyute fancyimpute requests_ntlm
+RUN conda install -c conda-forge pymc3=3 theano mkl-service seaborn \
+    tqdm aiofiles aiohttp html5lib spacy graphviz dask-kubernetes=0.10.0
+RUN conda install -c r rpy2
+RUN conda install -c pytorch pytorch-cpu=1 torchvision-cpu
 
-RUN pip install jupyterhub==0.9.6 distributed==2.7.0 dask==2.7.0 dask-kubernetes==0.10.0 jupyter-server-proxy && \
-    jupyter serverextension enable --sys-prefix jupyter_server_proxy
+# Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
+RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute
+
+# Jupyter lab extensions
+# Avoid "JavaScript heap out of memory" errors during extension installation
+RUN export NODE_OPTIONS=--max-old-space-size=4096
+# Jupyter widgets extension
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.1 --no-build
+
+# FigureWidget support
+# and jupyterlab renderer support
+RUN jupyter labextension install plotlywidget@1.4.0 --no-build
+RUN jupyter labextension install jupyterlab-plotly@1.4.0 --no-build
+
+RUN jupyter labextension install jupyterlab_vim --no-build
+
+# Build extensions (must be done to activate extensions since --no-build is used above)
+RUN jupyter lab build
+
+# Unset NODE_OPTIONS environment variable
+RUN unset NODE_OPTIONS
+
+RUN pip install jupyter-server-proxy && jupyter serverextension enable --sys-prefix jupyter_server_proxy
 
 # Numpy multithreading uses MKL lib and for it to work properly on kubernetes
 # this variable needs to be set. Else numpy thinks it has access to all cores on the node.
 ENV MKL_THREADING_LAYER=GNU
-
-# NLTK data (corpuses etc.)
-RUN python -c "import nltk; nltk.download('punkt')"
-RUN python -c "import nltk; nltk.download('averaged_perceptron_tagger')"
-RUN python -c "import nltk; nltk.download('stopwords')"
 
 CMD ["start.sh", "jupyter", "lab"]
