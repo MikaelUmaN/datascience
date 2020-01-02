@@ -1,7 +1,8 @@
 FROM jupyter/datascience-notebook:1386e2046833
 
 USER root
-RUN apt-get update && apt-get install -y htop neovim jq
+RUN apt-get update && apt-get install -y apt-utils htop neovim jq graphviz
+
 USER jovyan
 
 RUN conda install fastparquet pyarrow python-snappy pandas numpy
@@ -10,12 +11,9 @@ RUN pip install cufflinks==0.17.0 plotly==4.2.1 chart_studio==1.0.0 && \
     jupyter labextension install @jupyterlab/plotly-extension && \
     jupyter labextension install jupyterlab_vim
 
-RUN conda install -c conda-forge pymc3 theano mkl-service seaborn tqdm
-
+RUN conda install -c conda-forge pymc3 theano mkl-service seaborn tqdm aiofiles aiohttp html5lib nltk graphviz
 RUN conda install -c r rpy2
-
 RUN conda install -y dask distributed
-
 RUN conda install pytorch-cpu torchvision-cpu -c pytorch
 
 # Restrict plotly version because we need it to be in sync with cufflinks.
