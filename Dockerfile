@@ -7,9 +7,11 @@ USER jovyan
 
 # Lock jupyter client version because a bug for windows has been introduced in later versions.
 # Restrict plotly version because we need it to be in sync with cufflinks.
-RUN conda install -y jupyter_client=5.3.1 fastparquet pyarrow python-snappy pandas numpy=1 \
+# Degrade jupyterhub 1.0.0 -> 0.9.6 because https://github.com/jupyterhub/zero-to-jupyterhub-k8s stable depends on it.
+RUN conda install -y jupyter_client=5.3.1 jupyterhub=0.9.6 \
+    fastparquet pyarrow python-snappy pandas numpy=1 \
     cvxopt cvxpy lxml line_profiler cookiecutter dash=1 plotly=4 gunicorn \
-    pandas-profiling requests_ntlm dask=2 distributed=2
+    pandas-profiling requests_ntlm dask=2.9.0 distributed=2.9.0
 
 RUN conda install -c conda-forge pymc3=3 theano mkl-service seaborn \
     tqdm aiofiles aiohttp html5lib spacy graphviz dask-kubernetes=0.10.0
