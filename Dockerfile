@@ -19,7 +19,7 @@ RUN conda install -c r rpy2
 RUN conda install -c pytorch pytorch-cpu=1 torchvision-cpu
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
-RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute
+RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute s3fs graphviz pydot
 
 # Jupyter lab extensions
 # Avoid "JavaScript heap out of memory" errors during extension installation
