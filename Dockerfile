@@ -14,12 +14,12 @@ RUN conda install -y jupyter_client=5.3.1 jupyterhub=0.9.6 \
     pandas-profiling requests_ntlm dask=2.9.0 distributed=2.9.0
 
 RUN conda install -c conda-forge pymc3=3 theano mkl-service seaborn \
-    tqdm aiofiles aiohttp html5lib spacy graphviz dask-kubernetes=0.10.0
+    tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes=0.10.0 s3fs
 RUN conda install -c r rpy2
 RUN conda install -c pytorch pytorch-cpu=1 torchvision-cpu
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
-RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute
+RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute pydot
 
 # Jupyter lab extensions
 # Avoid "JavaScript heap out of memory" errors during extension installation
