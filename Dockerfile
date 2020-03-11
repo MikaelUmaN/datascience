@@ -1,7 +1,7 @@
 FROM jupyter/datascience-notebook:7a0c7325e470
 
 USER root
-RUN apt-get update && apt-get install -y htop neovim jq graphviz
+RUN apt-get update && apt-get install -y htop neovim jq graphviz openssh-client inetutils-ping
 
 USER jovyan
 
@@ -14,12 +14,17 @@ RUN conda install -y jupyter_client=5.3.1 jupyterhub=0.9.6 \
     pandas-profiling requests_ntlm dask=2.9.0 distributed=2.9.0
 
 RUN conda install -c conda-forge pymc3=3 theano mkl-service seaborn \
-    tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes=0.10.0 s3fs
+    tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes=0.10.0 s3fs \
+    awscli blpapi zeep autopep8 rope
 RUN conda install -c r rpy2
 RUN conda install -c pytorch pytorch-cpu=1 torchvision-cpu
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
-RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute pydot
+RUN pip install cufflinks==0.17.0 chart_studio==1.0.0 impyute fancyimpute pydot \
+    awscli-plugin-endpoint pydatastream
+
+# Autocomplete for awz
+RUN /bin/bash -c "complete -C aws_completer aws"
 
 # Jupyter lab extensions
 # Avoid "JavaScript heap out of memory" errors during extension installation
