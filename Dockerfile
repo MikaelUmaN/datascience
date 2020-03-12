@@ -13,7 +13,7 @@ RUN conda install -y jupyter_client=5.3.1 jupyterhub=0.9.6 \
     cvxopt cvxpy lxml line_profiler cookiecutter dash=1 plotly=4 gunicorn \
     pandas-profiling requests_ntlm dask=2.11.0 distributed=2.11.0
 
-RUN conda install -c conda-forge pymc3=3 theano mkl-service seaborn \
+RUN conda install -c conda-forge nodejs=12 pymc3=3 theano mkl-service seaborn \
     tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes=0.10.* s3fs \
     awscli blpapi zeep autopep8 rope
 RUN conda install -c r rpy2
@@ -34,8 +34,8 @@ RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.1 --no-bu
 
 # FigureWidget support
 # and jupyterlab renderer support
-RUN jupyter labextension install plotlywidget@1.4.0 --no-build
-RUN jupyter labextension install jupyterlab-plotly@1.4.0 --no-build
+RUN jupyter labextension install plotlywidget@1.5.4 --no-build
+RUN jupyter labextension install jupyterlab-plotly@1.5.4 --no-build
 
 RUN jupyter labextension install jupyterlab_vim --no-build
 
