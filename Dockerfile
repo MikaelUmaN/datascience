@@ -1,4 +1,4 @@
-FROM jupyter/datascience-notebook:7a0c7325e470
+FROM jupyter/datascience-notebook:76402a27fd13
 
 USER root
 
@@ -6,23 +6,20 @@ RUN apt-get update && apt-get install -y htop neovim jq graphviz openssh-client 
 
 USER jovyan
 
-# Lock jupyter client version because a bug for windows has been introduced in later versions.
-# Restrict plotly version because we need it to be in sync with cufflinks.
-# Degrade jupyterhub 1.0.0 -> 0.9.6 because https://github.com/jupyterhub/zero-to-jupyterhub-k8s stable depends on it.
-RUN conda install -y jupyter_client=5.3.1 jupyterhub=0.9.6 \
+# Fix jupyterhub 1.x.y -> 1.1.0 because https://github.com/jupyterhub/zero-to-jupyterhub-k8s stable depends on it. 
+RUN conda install -y jupyterhub=1.1.0 \
     fastparquet pyarrow python-snappy pandas=1 numpy=1 \
     cvxopt cvxpy lxml line_profiler cookiecutter dash=1 plotly=4 gunicorn \
-    pandas-profiling requests_ntlm dask=2.11.0 distributed=2.11.0 \
+    pandas-profiling requests_ntlm dask=2.17.2 distributed=2.17 \
     conda-build bottleneck pylint pytest portalocker h5py
 
-RUN conda install pytorch torchvision cpuonly -c pytorch
+RUN conda install pytorch=1.5 torchvision cpuonly -c pytorch
 RUN conda install -c conda-forge nodejs=12 pymc3=3 theano mkl-service seaborn \
-    tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes=0.10.* s3fs \
+    tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes s3fs \
     awscli blpapi zeep autopep8 rope
-RUN conda install -c r rpy2
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
-RUN pip install cufflinks==0.17.* chart_studio==1.0.0 impyute pydot \
+RUN pip install cufflinks==0.17.* chart_studio==1.1.0 impyute pydot \
     awscli-plugin-endpoint pydatastream
 
 # Autocomplete for awz
@@ -31,18 +28,14 @@ RUN /bin/bash -c "complete -C aws_completer aws"
 # Jupyter lab extensions
 # Avoid "JavaScript heap out of memory" errors during extension installation
 RUN export NODE_OPTIONS=--max-old-space-size=4096
-# Jupyter widgets extension
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.1 --no-build
 
-# FigureWidget support
-# and jupyterlab renderer support
-RUN jupyter labextension install plotlywidget@1.5.4 --no-build
-RUN jupyter labextension install jupyterlab-plotly@1.5.4 --no-build
+# Install plotly for jupyterlab according to: https://github.com/plotly/plotly.py/blob/master/README.md
+RUN conda install jupyterlab "ipywidgets=7.5"
 
-RUN jupyter labextension install jupyterlab_vim --no-build
-
-# Build extensions (must be done to activate extensions since --no-build is used above)
-RUN jupyter lab build
+# Basic JupyterLab renderer support
+RUN jupyter labextension install jupyterlab-plotly@4.8.1
+# OPTIONAL: Jupyter widgets extension for FigureWidget support
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1
 
 # Unset NODE_OPTIONS environment variable
 RUN unset NODE_OPTIONS
@@ -52,5 +45,9 @@ RUN pip install jupyter-server-proxy && jupyter serverextension enable --sys-pre
 # Numpy multithreading uses MKL lib and for it to work properly on kubernetes
 # this variable needs to be set. Else numpy thinks it has access to all cores on the node.
 ENV MKL_THREADING_LAYER=GNU
+
+# Allow insecure writes according to https://github.com/jupyter/docker-stacks/issues/963
+# because otherwise we cannot mount jovyan home folder.
+ENV JUPYTER_ALLOW_INSECURE_WRITES=true
 
 CMD ["start.sh", "jupyter", "lab"]
