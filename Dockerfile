@@ -1,4 +1,4 @@
-FROM jupyter/datascience-notebook:76402a27fd13
+FROM jupyter/scipy-notebook:latest
 
 USER root
 
@@ -39,21 +39,18 @@ USER jovyan
     # 'widgetsnbextension=3.5.*'\
     # 'xlrd=1.2.*' \
 
-RUN conda install -c pytorch pytorch torchvision cpuonly \
-    && conda clean --all -f -y
-
 # Fix jupyterhub 1.x.y -> 1.1.0 because https://github.com/jupyterhub/zero-to-jupyterhub-k8s stable depends on it. 
-RUN conda install -y jupyterhub=1.1.0 \
+RUN conda install -y jupyterhub \
     fastparquet pyarrow python-snappy \
-    cvxopt cvxpy lxml line_profiler cookiecutter dash=1 plotly=4 gunicorn \
+    cvxopt cvxpy lxml line_profiler cookiecutter dash plotly gunicorn \
     pandas-profiling requests_ntlm distributed \
-    conda-build pylint pytest portalocker \
-    && conda clean --all -f -y
+    conda-build pylint pytest portalocker
 
 RUN conda install -c conda-forge pymc3 theano mkl-service \
     tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes s3fs \
-    awscli zeep autopep8 rope blpapi zeep \
-    && conda clean --all -f -y
+    awscli zeep autopep8 rope blpapi zeep
+
+RUN conda install -c pytorch pytorch=1.5 torchvision cpuonly
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
 RUN pip install cufflinks==0.17.* chart_studio==1.1.0 impyute pydot \
