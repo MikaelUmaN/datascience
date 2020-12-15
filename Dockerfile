@@ -10,36 +10,33 @@ USER jovyan
 
     # 'beautifulsoup4=4.9.*' \
     # 'conda-forge::blas=*=openblas' \
-    # 'bokeh=2.0.*' \
+    # 'bokeh=2.2.*' \
     # 'bottleneck=1.3.*' \
-    # 'cloudpickle=1.4.*' \
+    # 'cloudpickle=1.6.*' \
     # 'cython=0.29.*' \
-    # 'dask=2.15.*' \
+    # 'dask=2.30.*' \
     # 'dill=0.3.*' \
-    # 'h5py=2.10.*' \
-    # 'hdf5=1.10.*' \
+    # 'h5py=3.1.*' \
     # 'ipywidgets=7.5.*' \
     # 'ipympl=0.5.*'\
-    # 'matplotlib-base=3.2.*' \
-    # # numba update to 0.49 fails resolving deps.
-    # 'numba=0.48.*' \
+    # 'matplotlib-base=3.3.*' \
+    # 'numba=0.51.*' \
     # 'numexpr=2.7.*' \
-    # 'pandas=1.0.*' \
+    # 'pandas=1.1.*' \
     # 'patsy=0.5.*' \
-    # 'protobuf=3.11.*' \
+    # 'protobuf=3.13.*' \
     # 'pytables=3.6.*' \
-    # 'scikit-image=0.16.*' \
-    # 'scikit-learn=0.22.*' \
-    # 'scipy=1.4.*' \
-    # 'seaborn=0.10.*' \
+    # 'scikit-image=0.17.*' \
+    # 'scikit-learn=0.23.*' \
+    # 'scipy=1.5.*' \
+    # 'seaborn=0.11.*' \
     # 'sqlalchemy=1.3.*' \
-    # 'statsmodels=0.11.*' \
-    # 'sympy=1.5.*' \
+    # 'statsmodels=0.12.*' \
+    # 'sympy=1.7.*' \
     # 'vincent=0.4.*' \
     # 'widgetsnbextension=3.5.*'\
     # 'xlrd=1.2.*' \
 
-# Fix jupyterhub 1.x.y -> 1.1.0 because https://github.com/jupyterhub/zero-to-jupyterhub-k8s stable depends on it. 
 RUN conda install -y jupyterhub \
     fastparquet pyarrow python-snappy \
     cvxopt cvxpy lxml line_profiler cookiecutter dash plotly gunicorn \
@@ -48,9 +45,9 @@ RUN conda install -y jupyterhub \
 
 RUN conda install -c conda-forge pymc3 theano mkl-service \
     tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes s3fs \
-    awscli zeep autopep8 rope blpapi zeep
+    awscli zeep autopep8 rope blpapi zeep python-confluent-kafka
 
-RUN conda install -c pytorch pytorch=1.5 torchvision cpuonly
+RUN conda install -c pytorch pytorch=1.6 torchvision cpuonly
 
 # Install cufflinks and jupyter plotly extension, requires jupyterlab=1.2 and ipywidgets=7.5
 RUN pip install cufflinks==0.17.* chart_studio==1.1.0 impyute pydot \
@@ -66,9 +63,9 @@ RUN export NODE_OPTIONS=--max-old-space-size=4096
 # Install plotly for jupyterlab according to: https://github.com/plotly/plotly.py/blob/master/README.md
 # ipywidgets is installed in base image.
 # Basic JupyterLab renderer support
-RUN jupyter labextension install jupyterlab-plotly@4.8.1
+RUN jupyter labextension install jupyterlab-plotly@4.14.1
 # OPTIONAL: Jupyter widgets extension for FigureWidget support
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.14.1
 
 # Unset NODE_OPTIONS environment variable
 RUN unset NODE_OPTIONS
