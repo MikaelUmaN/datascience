@@ -45,7 +45,7 @@ RUN conda install -y jupyterhub \
 
 RUN conda install -c conda-forge pymc3 theano mkl-service \
     tqdm aiofiles aiohttp html5lib spacy python-graphviz dask-kubernetes s3fs \
-    awscli zeep autopep8 rope blpapi zeep python-confluent-kafka
+    awscli zeep autopep8 rope blpapi zeep python-confluent-kafka python-avro
 
 RUN conda install -c pytorch pytorch=1.6 torchvision cpuonly
 
